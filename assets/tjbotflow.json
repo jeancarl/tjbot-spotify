@@ -1,0 +1,229 @@
+[
+  {
+    "id": "cd3a7b12.fda1a",
+    "type": "change",
+    "z": "66c8f290.3fa3dc",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "url",
+        "pt": "msg",
+        "to": "payload.url",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "oldpayload",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 300,
+    "y": 820,
+    "wires": [
+      [
+        "6eb40367.ff73fc",
+        "56c18dd.d160ff4"
+      ]
+    ]
+  },
+  {
+    "id": "80696d38.626a9",
+    "type": "comment",
+    "z": "66c8f290.3fa3dc",
+    "name": "Play audio URL",
+    "info": "",
+    "x": 120,
+    "y": 780,
+    "wires": []
+  },
+  {
+    "id": "56c18dd.d160ff4",
+    "type": "http request",
+    "z": "66c8f290.3fa3dc",
+    "name": "",
+    "method": "GET",
+    "ret": "bin",
+    "url": "",
+    "tls": "",
+    "x": 490,
+    "y": 820,
+    "wires": [
+      [
+        "ef58027f.cbc1f8"
+      ]
+    ]
+  },
+  {
+    "id": "ef58027f.cbc1f8",
+    "type": "file",
+    "z": "66c8f290.3fa3dc",
+    "name": "",
+    "filename": "/tmp/spotify.mp3",
+    "appendNewline": true,
+    "createDir": false,
+    "overwriteFile": "true",
+    "x": 670,
+    "y": 820,
+    "wires": []
+  },
+  {
+    "id": "feb05c99.a4723",
+    "type": "exec",
+    "z": "66c8f290.3fa3dc",
+    "command": "mpg123 -w /tmp/spotify.wav /tmp/spotify.mp3",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "",
+    "timer": "",
+    "name": "",
+    "x": 460,
+    "y": 980,
+    "wires": [
+      [
+        "85ac2522.046c38"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "85ac2522.046c38",
+    "type": "change",
+    "z": "66c8f290.3fa3dc",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "/tmp/spotify.wav",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 740,
+    "y": 960,
+    "wires": [
+      [
+        "b18808f7.004b98"
+      ]
+    ]
+  },
+  {
+    "id": "b18808f7.004b98",
+    "type": "tjbot-speak",
+    "z": "66c8f290.3fa3dc",
+    "botId": "9b5732f6.6ae698",
+    "mode": "play",
+    "payload": "",
+    "name": "Play Song",
+    "x": 910,
+    "y": 960,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "558290ba.98ec9",
+    "type": "tjbot-speak",
+    "z": "66c8f290.3fa3dc",
+    "botId": "9b5732f6.6ae698",
+    "mode": "speak",
+    "payload": "",
+    "name": "",
+    "x": 650,
+    "y": 860,
+    "wires": [
+      [
+        "feb05c99.a4723"
+      ]
+    ]
+  },
+  {
+    "id": "6eb40367.ff73fc",
+    "type": "change",
+    "z": "66c8f290.3fa3dc",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "oldpayload.title",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 500,
+    "y": 860,
+    "wires": [
+      [
+        "558290ba.98ec9"
+      ]
+    ]
+  },
+  {
+    "id": "d3065ad1.43856",
+    "type": "wiotp in",
+    "z": "66c8f290.3fa3dc",
+    "authType": "d",
+    "deviceKey": "88250c17.de9188",
+    "deviceType": "",
+    "deviceId": "",
+    "command": "+",
+    "commandType": "g",
+    "qos": 0,
+    "name": "",
+    "x": 110,
+    "y": 820,
+    "wires": [
+      [
+        "cd3a7b12.fda1a"
+      ]
+    ]
+  },
+  {
+    "id": "9b5732f6.6ae698",
+    "type": "tjbot-config",
+    "z": "",
+    "botGender": "male",
+    "name": "DJBot",
+    "speak": "en-US",
+    "hasServo": false,
+    "hasLED": false,
+    "hasSpeaker": true,
+    "hasMicrophone": false,
+    "hasCamera": false,
+    "speakerDeviceId": "plughw:0,0"
+  },
+  {
+    "id": "88250c17.de9188",
+    "type": "wiotp-credentials",
+    "z": "",
+    "name": "",
+    "org": "",
+    "serverName": "",
+    "devType": "tjbot",
+    "devId": "djbot",
+    "keepalive": "60",
+    "cleansession": true,
+    "tls": "",
+    "usetls": false
+  }
+]

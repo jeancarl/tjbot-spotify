@@ -1,0 +1,966 @@
+[
+  {
+    "id": "103ea72c.510b59",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Search",
+    "func": "msg.headers = {\n    'Authorization': 'Bearer ' + global.get('token')\n};\n\nmsg.url = 'https://api.spotify.com/v1/search?type=track&q='+msg.payload;\n\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 780,
+    "y": 100,
+    "wires": [
+      [
+        "a0755ef8.0f366"
+      ]
+    ]
+  },
+  {
+    "id": "a0755ef8.0f366",
+    "type": "http request",
+    "z": "deb0d57.1c46528",
+    "name": "Search Spotify",
+    "method": "GET",
+    "ret": "obj",
+    "url": "",
+    "tls": "",
+    "x": 940,
+    "y": 100,
+    "wires": [
+      [
+        "aa9cd3fc.5058d",
+        "20380fa7.fca09"
+      ]
+    ]
+  },
+  {
+    "id": "b585650c.1b69b",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Send Track Info to TJBot",
+    "func": "msg.payload.tracks.items = msg.payload.tracks.items.filter(t => {\n    return t.preview_url !== null;\n});\n\nmsg.payload = {\n    title: msg.payload.tracks.items[0].name,\n    artist: msg.payload.tracks.items[0].artists.map(a => { return a.name; }).join(', '),\n    url: msg.payload.tracks.items[0].preview_url\n};\n\nmsg.eventOrCommandType = \"play_spotify\";\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 530,
+    "y": 280,
+    "wires": [
+      [
+        "ac2b4d33.c05b4",
+        "29cbbd1e.c19e82"
+      ]
+    ]
+  },
+  {
+    "id": "ac2b4d33.c05b4",
+    "type": "json",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "x": 750,
+    "y": 280,
+    "wires": [
+      [
+        "7a8295a8.28283c",
+        "8c8b4888.513f48"
+      ]
+    ]
+  },
+  {
+    "id": "7a8295a8.28283c",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "false",
+    "x": 910,
+    "y": 320,
+    "wires": []
+  },
+  {
+    "id": "e35d4686.f9e94",
+    "type": "link out",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "links": [
+      "2ae97428.eb5af4"
+    ],
+    "x": 655,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "4e17972e.796cd8",
+    "type": "link in",
+    "z": "deb0d57.1c46528",
+    "name": "Continue Search",
+    "links": [
+      "d54ba61d.6c0908"
+    ],
+    "x": 695,
+    "y": 160,
+    "wires": [
+      [
+        "103ea72c.510b59"
+      ]
+    ]
+  },
+  {
+    "id": "4daafd1c.61ad9c",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Token Expired?",
+    "func": "if(global.get('expires') >= Date.now()) {\n    return [msg, null];\n} else {\n    return [null, msg];\n}",
+    "outputs": "2",
+    "noerr": 0,
+    "x": 540,
+    "y": 120,
+    "wires": [
+      [
+        "103ea72c.510b59"
+      ],
+      [
+        "e35d4686.f9e94"
+      ]
+    ]
+  },
+  {
+    "id": "853601e8.1e817",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "func": "flow.set('songTitle', msg.payload);\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 970,
+    "y": 540,
+    "wires": [
+      [
+        "679b4a97.81b534"
+      ]
+    ]
+  },
+  {
+    "id": "36d505fb.f1783a",
+    "type": "comment",
+    "z": "deb0d57.1c46528",
+    "name": "Search Box UI for Spotify",
+    "info": "",
+    "x": 210,
+    "y": 500,
+    "wires": []
+  },
+  {
+    "id": "8df84c4e.c899b8",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Populate Options",
+    "func": "msg.options = [\n    \"custom\",\n    \"mr. roboto\"\n];\n\nmsg.payload = \"custom\";\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 350,
+    "y": 540,
+    "wires": [
+      [
+        "3f936a16.b22ece"
+      ]
+    ]
+  },
+  {
+    "id": "679b4a97.81b534",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": "false",
+    "complete": "false",
+    "x": 1110,
+    "y": 540,
+    "wires": []
+  },
+  {
+    "id": "cb85ccfc.1232d8",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "func": "if(msg.payload == \"custom\") {\n    msg.enabled = true;\n    msg.payload = \"\";\n    \n} else {\n    msg.enabled = false;\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 670,
+    "y": 540,
+    "wires": [
+      [
+        "9b089c98.2fb36"
+      ]
+    ]
+  },
+  {
+    "id": "98312dde.b70e3",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Set Song Title Search",
+    "func": "msg.payload = flow.get('songTitle');\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 340,
+    "y": 120,
+    "wires": [
+      [
+        "4daafd1c.61ad9c"
+      ]
+    ]
+  },
+  {
+    "id": "aa9cd3fc.5058d",
+    "type": "switch",
+    "z": "deb0d57.1c46528",
+    "name": "Error?",
+    "property": "payload.error",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "nnull"
+      },
+      {
+        "t": "else"
+      }
+    ],
+    "checkall": "true",
+    "outputs": 2,
+    "x": 330,
+    "y": 260,
+    "wires": [
+      [
+        "84d563d9.f48c1"
+      ],
+      [
+        "b585650c.1b69b",
+        "7a95a100.deab58"
+      ]
+    ]
+  },
+  {
+    "id": "84d563d9.f48c1",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "payload.error.message",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 500,
+    "y": 240,
+    "wires": [
+      [
+        "dc7fec5e.91f64"
+      ]
+    ]
+  },
+  {
+    "id": "29cbbd1e.c19e82",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "$join([\"Now playing\", msg.payload.title, \"by\", msg.payload.artist], \" \")",
+        "tot": "jsonata"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 780,
+    "y": 360,
+    "wires": [
+      [
+        "5b5f1041.57471"
+      ]
+    ]
+  },
+  {
+    "id": "4042d6ca.9e9e18",
+    "type": "comment",
+    "z": "deb0d57.1c46528",
+    "name": "Search Spotify",
+    "info": "",
+    "x": 180,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "20380fa7.fca09",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "false",
+    "x": 1150,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "cfc449e4.7b9a68",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "false",
+    "x": 710,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "7a95a100.deab58",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "Set Album Art Cover",
+    "func": "msg.payload = {\n    image: msg.payload.tracks.items[0].album.images[1].url,\n    title: msg.payload.tracks.items[0].name\n};\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 520,
+    "y": 440,
+    "wires": [
+      [
+        "3b5c90f8.c5b998",
+        "cfc449e4.7b9a68"
+      ]
+    ]
+  },
+  {
+    "id": "475445ca.3ec314",
+    "type": "http in",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "url": "/spotify/authorize",
+    "method": "get",
+    "swaggerDoc": "",
+    "x": 200,
+    "y": 820,
+    "wires": [
+      [
+        "a95eab33.4c1748"
+      ]
+    ]
+  },
+  {
+    "id": "16789987.c168be",
+    "type": "http response",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "x": 530,
+    "y": 820,
+    "wires": []
+  },
+  {
+    "id": "b5138299.5443",
+    "type": "http in",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "url": "/spotify/callback",
+    "method": "get",
+    "swaggerDoc": "",
+    "x": 740,
+    "y": 820,
+    "wires": [
+      [
+        "a6def3c9.802968",
+        "edfb3074.5788e8"
+      ]
+    ]
+  },
+  {
+    "id": "65f93ea4.6981e8",
+    "type": "http response",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "x": 1370,
+    "y": 820,
+    "wires": []
+  },
+  {
+    "id": "dd7c8070.f96a3",
+    "type": "http request",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "method": "POST",
+    "ret": "obj",
+    "url": "https://accounts.spotify.com/api/token",
+    "tls": "",
+    "x": 1050,
+    "y": 820,
+    "wires": [
+      [
+        "4505156e.39e0c4"
+      ]
+    ]
+  },
+  {
+    "id": "a6def3c9.802968",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "func": "\nmsg.payload = {\n    grant_type: 'authorization_code',\n    code: msg.payload.code,\n    redirect_uri: global.get('spotifyCallback')\n};\n\nmsg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    'Authorization': 'Basic '+new Buffer(global.get('spotifyClientID')+':'+global.get('spotifyClientSecret')).toString('base64')\n};\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 910,
+    "y": 820,
+    "wires": [
+      [
+        "dd7c8070.f96a3"
+      ]
+    ]
+  },
+  {
+    "id": "4505156e.39e0c4",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "accessToken",
+        "pt": "global",
+        "to": "payload.access_token",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "refreshToken",
+        "pt": "global",
+        "to": "payload.refresh_token",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "headers",
+        "pt": "msg",
+        "to": "{}",
+        "tot": "json"
+      },
+      {
+        "t": "set",
+        "p": "headers.Location",
+        "pt": "msg",
+        "to": "uiURL",
+        "tot": "global"
+      },
+      {
+        "t": "set",
+        "p": "statusCode",
+        "pt": "msg",
+        "to": "302",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 1220,
+    "y": 820,
+    "wires": [
+      [
+        "65f93ea4.6981e8"
+      ]
+    ]
+  },
+  {
+    "id": "b077e66e.a98b88",
+    "type": "inject",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "x": 260,
+    "y": 680,
+    "wires": [
+      [
+        "ba3bb9a5.859098"
+      ]
+    ]
+  },
+  {
+    "id": "913e16a5.32b468",
+    "type": "http request",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "method": "POST",
+    "ret": "obj",
+    "url": "https://accounts.spotify.com/api/token",
+    "tls": "",
+    "x": 550,
+    "y": 720,
+    "wires": [
+      [
+        "d7c3a309.3b1968",
+        "5608b49b.6a28bc"
+      ]
+    ]
+  },
+  {
+    "id": "ba3bb9a5.859098",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "func": "\nmsg.payload = {\n    grant_type: 'refresh_token',\n    \"refresh_token\": global.get('refreshToken')\n};\n\nmsg.headers = {\n    'content-type': 'application/x-www-form-urlencoded',\n    'Authorization': 'Basic '+new Buffer(global.get('spotifyClientID')+':'+global.get('spotifyClientSecret')).toString('base64')\n};\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 410,
+    "y": 720,
+    "wires": [
+      [
+        "913e16a5.32b468"
+      ]
+    ]
+  },
+  {
+    "id": "d7c3a309.3b1968",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "token",
+        "pt": "global",
+        "to": "payload.access_token",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "refreshToken",
+        "pt": "global",
+        "to": "payload.refresh_token ",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "oldpayload",
+        "tot": "msg"
+      },
+      {
+        "t": "set",
+        "p": "tokenExpires",
+        "pt": "global",
+        "to": "$sum([$toMillis($now()),msg.payload.expires_in])\t\t",
+        "tot": "jsonata"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 720,
+    "y": 720,
+    "wires": [
+      [
+        "d54ba61d.6c0908"
+      ]
+    ]
+  },
+  {
+    "id": "2ae97428.eb5af4",
+    "type": "link in",
+    "z": "deb0d57.1c46528",
+    "name": "Refresh Token",
+    "links": [
+      "f855e463.229c58",
+      "314cd21b.3c471e",
+      "dd61395a.dd1b08",
+      "e54aada.e52d35",
+      "c8fc08ca.11624",
+      "e35d4686.f9e94"
+    ],
+    "x": 115,
+    "y": 720,
+    "wires": [
+      [
+        "c4f8bb1b.fe575"
+      ]
+    ]
+  },
+  {
+    "id": "d54ba61d.6c0908",
+    "type": "link out",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "links": [
+      "4e17972e.796cd8"
+    ],
+    "x": 835,
+    "y": 720,
+    "wires": []
+  },
+  {
+    "id": "c4f8bb1b.fe575",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "Save Payload",
+    "rules": [
+      {
+        "t": "set",
+        "p": "oldpayload",
+        "pt": "msg",
+        "to": "payload",
+        "tot": "msg"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 235,
+    "y": 720,
+    "wires": [
+      [
+        "ba3bb9a5.859098"
+      ]
+    ]
+  },
+  {
+    "id": "e1ae79f2.885e88",
+    "type": "inject",
+    "z": "deb0d57.1c46528",
+    "name": "On Start",
+    "topic": "",
+    "payload": "",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "",
+    "x": 180,
+    "y": 540,
+    "wires": [
+      [
+        "87cfcb37.faea68",
+        "8df84c4e.c899b8"
+      ]
+    ]
+  },
+  {
+    "id": "87cfcb37.faea68",
+    "type": "change",
+    "z": "deb0d57.1c46528",
+    "name": "Set Configuration",
+    "rules": [
+      {
+        "t": "set",
+        "p": "spotifyClientID",
+        "pt": "global",
+        "to": "",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "spotifyClientSecret",
+        "pt": "global",
+        "to": "",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "spotifyCallback",
+        "pt": "global",
+        "to": "https://--.mybluemix.net/spotify/callback",
+        "tot": "str"
+      },
+      {
+        "t": "set",
+        "p": "uiURL",
+        "pt": "global",
+        "to": "https://--.mybluemix.net/ui",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 350,
+    "y": 580,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "9c9a432d.d9eca8",
+    "type": "comment",
+    "z": "deb0d57.1c46528",
+    "name": "Authorization Callback",
+    "info": "",
+    "x": 740,
+    "y": 780,
+    "wires": []
+  },
+  {
+    "id": "7e499540.2abdec",
+    "type": "comment",
+    "z": "deb0d57.1c46528",
+    "name": "Authorization Redirect",
+    "info": "",
+    "x": 200,
+    "y": 780,
+    "wires": []
+  },
+  {
+    "id": "49e3b76f.b5e5e8",
+    "type": "comment",
+    "z": "deb0d57.1c46528",
+    "name": "Update Access Token",
+    "info": "",
+    "x": 200,
+    "y": 640,
+    "wires": []
+  },
+  {
+    "id": "5608b49b.6a28bc",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "false",
+    "x": 710,
+    "y": 680,
+    "wires": []
+  },
+  {
+    "id": "edfb3074.5788e8",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "false",
+    "x": 930,
+    "y": 860,
+    "wires": []
+  },
+  {
+    "id": "e6f18f79.4660e8",
+    "type": "debug",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "active": true,
+    "console": false,
+    "complete": "true",
+    "x": 530,
+    "y": 860,
+    "wires": []
+  },
+  {
+    "id": "a95eab33.4c1748",
+    "type": "function",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "func": "var scopes = '';\nmsg.statusCode = 302;\nmsg.headers = {\"Location\":'https://accounts.spotify.com/authorize' +\n  '?response_type=code' +\n  '&client_id=' + global.get('spotifyClientID') +\n  (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +\n  '&redirect_uri=' + encodeURIComponent(global.get('spotifyCallback'))};\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 390,
+    "y": 820,
+    "wires": [
+      [
+        "16789987.c168be",
+        "e6f18f79.4660e8"
+      ]
+    ]
+  },
+  {
+    "id": "8c8b4888.513f48",
+    "type": "ibmiot out",
+    "z": "deb0d57.1c46528",
+    "authentication": "boundService",
+    "apiKey": "",
+    "outputType": "cmd",
+    "deviceId": "orange",
+    "deviceType": "tjbot",
+    "eventCommandType": "play_spotify",
+    "format": "json",
+    "data": "{}",
+    "qos": 0,
+    "name": "IBM IoT",
+    "service": "registered",
+    "x": 900,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "54559462.a9979c",
+    "type": "ui_button",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "group": "e802421b.4d11b8",
+    "order": 0,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "Search",
+    "color": "",
+    "bgcolor": "",
+    "icon": "",
+    "payload": "",
+    "payloadType": "str",
+    "topic": "",
+    "x": 160,
+    "y": 120,
+    "wires": [
+      [
+        "98312dde.b70e3"
+      ]
+    ]
+  },
+  {
+    "id": "3f936a16.b22ece",
+    "type": "ui_dropdown",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "label": "",
+    "place": "custom",
+    "group": "e802421b.4d11b8",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "options": [
+      {
+        "label": "custom",
+        "value": "custom",
+        "type": "str"
+      }
+    ],
+    "payload": "",
+    "topic": "",
+    "x": 530,
+    "y": 540,
+    "wires": [
+      [
+        "cb85ccfc.1232d8"
+      ]
+    ]
+  },
+  {
+    "id": "9b089c98.2fb36",
+    "type": "ui_text_input",
+    "z": "deb0d57.1c46528",
+    "name": "",
+    "label": "Enter song title",
+    "group": "e802421b.4d11b8",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "mode": "text",
+    "delay": "700",
+    "topic": "",
+    "x": 820,
+    "y": 540,
+    "wires": [
+      [
+        "853601e8.1e817"
+      ]
+    ]
+  },
+  {
+    "id": "dc7fec5e.91f64",
+    "type": "ui_toast",
+    "z": "deb0d57.1c46528",
+    "position": "top right",
+    "displayTime": "3",
+    "highlight": "",
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "topic": "",
+    "name": "",
+    "x": 690,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "5b5f1041.57471",
+    "type": "ui_toast",
+    "z": "deb0d57.1c46528",
+    "position": "top right",
+    "displayTime": "3",
+    "highlight": "",
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "topic": "",
+    "name": "",
+    "x": 970,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "3b5c90f8.c5b998",
+    "type": "ui_template",
+    "z": "deb0d57.1c46528",
+    "group": "e802421b.4d11b8",
+    "name": "",
+    "order": 0,
+    "width": "6",
+    "height": "6",
+    "format": "<div>Now playing: {{msg.payload.title}}<br /><br /><img ng-src=\"{{msg.payload.image}}\" style=\"max-width: 300px\" /></div>",
+    "storeOutMessages": true,
+    "fwdInMessages": true,
+    "templateScope": "local",
+    "x": 700,
+    "y": 420,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "e802421b.4d11b8",
+    "type": "ui_group",
+    "z": "deb0d57.1c46528",
+    "name": "Music",
+    "tab": "bd4de799.3498e",
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "bd4de799.3498e",
+    "type": "ui_tab",
+    "z": "deb0d57.1c46528",
+    "name": "DJBot",
+    "icon": "dashboard"
+  }
+]
